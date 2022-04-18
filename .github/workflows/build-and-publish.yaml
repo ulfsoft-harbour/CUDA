@@ -32,7 +32,7 @@ jobs:
       - name: Setup environment
         run: |
           echo "OS_VERSION=${OS_VERSION:-ubuntu20.04}" >> $GITHUB_ENV
-          echo "CUDA_VERSION=${CUDA_VERSION:-11.06}" >> $GITHUB_ENV
+          echo "CUDA_VERSION=${CUDA_VERSION:-11.06.0}" >> $GITHUB_ENV
           echo "RUN_ID=$(date +'%Y%m%d').${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: Checkout repository
