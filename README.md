@@ -1,3 +1,3 @@
-![HarbourB/cuda](docs/images/header.png)
+![harbourb/CUDA](docs/images/header.png)
 
-# HarbourB/cuda
+# harbourb/CUDA
