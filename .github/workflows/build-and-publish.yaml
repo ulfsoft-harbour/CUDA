@@ -79,8 +79,12 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/sdk:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/sdk:${{ env.RUN_ID }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/sdk:${{ env.CUDA_VERSION }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/sdk:${{ env.CUDA_VERSION }}-${{ env.RUN_ID }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            OS_VERSION=${{ env.OS_VERSION }}
+            CUDA_VERSION=${{ env.CUDA_VERSION }}
 
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
@@ -93,4 +97,4 @@ jobs:
           COSIGN_EXPERIMENTAL: "true"
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
+        run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/sdk@${{ steps.build-and-push.outputs.digest }}
