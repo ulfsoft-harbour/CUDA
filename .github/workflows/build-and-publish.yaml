@@ -12,11 +12,11 @@ on:
       - master
 
 env:
-  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
   OS_VERSION: ${{ github.event.inputs.os_version }}
   CUDA_VERSION: ${{ github.event.inputs.cuda_version }}
-  REGISTRY: ghcr.io
-  SDK_IMAGE_NAME: ${{ github.repository_owner }}/cuda
 
 jobs:
   build-sdk:
@@ -33,11 +33,12 @@ jobs:
         run: |
           echo "OS_VERSION=${OS_VERSION:-ubuntu20.04}" >> $GITHUB_ENV
           echo "CUDA_VERSION=${CUDA_VERSION:-11.06}" >> $GITHUB_ENV
+          echo "RUN_ID=$(date +'%Y%m%d').${{ github.run_number }}" >> $GITHUB_ENV
 
-      - name: Print debug
+      - name: DEBUG
         run: |
-          echo "OS_VERSION: ${{ env.OS_VERSION }} | CUDA: ${{ env.CUDA_VERSION }}"
-
+          echo "tag with: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/sdk:latest"
+          echo "tag with: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/sdk:${{ env.RUN_ID }}"
       # - name: Checkout repository
       #   uses: actions/checkout@v3
 
@@ -49,11 +50,9 @@ jobs:
       #   with:
       #     cosign-release: "v1.7.1"
 
-      # # https://github.com/docker/build-push-action/issues/579
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v1
-      #   with:
-      #     version: v0.8.2
+      # # Workaround: https://github.com/docker/build-push-action/issues/461
+      # - name: Setup Docker buildx
+      #   uses: docker/setup-buildx-action@79abd3f86f79a9d68a23c75a09a9a85889262adf
 
       # # Login against a Docker registry except on PR
       # # https://github.com/docker/login-action
@@ -71,7 +70,7 @@ jobs:
       #   id: meta
       #   uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
       #   with:
-      #     images: ${{ env.REGISTRY }}/${{ env.SDK_IMAGE_NAME }}
+      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       # # Build and push Docker image with Buildx (don't push on PR)
       # # https://github.com/docker/build-push-action
@@ -79,26 +78,23 @@ jobs:
       #   id: build-and-push
       #   uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
       #   with:
-      #     file: cuda/cuda-sdk.Dockerfile
-      #     context: cuda
+      #     file: sdk.Dockerfile
+      #     context: .
       #     push: ${{ github.event_name != 'pull_request' }}
       #     tags: |
-      #       ${{ steps.meta.outputs.tags }}
-      #       ${{ env.REGISTRY }}/${{ env.SDK_IMAGE_NAME }}:${{ env.CUDA_VERSION }}-sdk
+      #       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-sdk:latest
+      #       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-sdk:latest
       #     labels: ${{ steps.meta.outputs.labels }}
-      #     build-args: |
-      #       OS_VERSION=${{ env.OS_VERSION }}
-      #       CUDA_VERSION=${{ env.CUDA_VERSION }}
 
-      ## Sign the resulting Docker image digest except on PRs.
-      ## This will only write to the public Rekor transparency log when the Docker
-      ## repository is public to avoid leaking data.  If you would like to publish
-      ## transparency data even for private images, pass --force to cosign below.
-      ## https://github.com/sigstore/cosign
-      #- name: Sign the published Docker image
-      #  if: ${{ github.event_name != 'pull_request' }}
-      #  env:
-      #    COSIGN_EXPERIMENTAL: "true"
-      ## This step uses the identity token to provision an ephemeral certificate
-      ## against the sigstore community Fulcio instance.
-      #run: cosign sign ${{ env.REGISTRY }}/${{ env.SDK_IMAGE_NAME }}@${{ steps.build-and-push.outputs.imageid }}
+      # # Sign the resulting Docker image digest except on PRs.
+      # # This will only write to the public Rekor transparency log when the Docker
+      # # repository is public to avoid leaking data.  If you would like to publish
+      # # transparency data even for private images, pass --force to cosign below.
+      # # https://github.com/sigstore/cosign
+      # - name: Sign the published Docker image
+      #   if: ${{ github.event_name != 'pull_request' }}
+      #   env:
+      #     COSIGN_EXPERIMENTAL: "true"
+      #   # This step uses the identity token to provision an ephemeral certificate
+      #   # against the sigstore community Fulcio instance.
+      #   run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
