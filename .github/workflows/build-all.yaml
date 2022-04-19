@@ -38,3 +38,5 @@ jobs:
       target: sdk-vscode
       os_version: ${{ github.event.inputs.os_version }}
       cuda_version: ${{ github.event.inputs.cuda_version }}
+    needs:
+      - build-sdk
