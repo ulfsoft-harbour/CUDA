@@ -28,13 +28,13 @@ jobs:
     uses: harbourb/cuda/.github/workflows/build-and-push.yaml@master
     with:
       target: sdk
-      os_version: ${{ inputs.os_version }}
-      cuda_version: ${{ inputs.cuda_version }}
+      os_version: ${{ github.event.inputs.os_version }}
+      cuda_version: ${{ github.event.inputs.cuda_version }}
 
   build-sdk-vscode:
     name: Build sdk
     uses: harbourb/cuda/.github/workflows/build-and-push.yaml@master
     with:
       target: sdk-vscode
-      os_version: ${{ inputs.os_version }}
-      cuda_version: ${{ inputs.cuda_version }}
+      os_version: ${{ github.event.inputs.os_version }}
+      cuda_version: ${{ github.event.inputs.cuda_version }}

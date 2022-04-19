@@ -4,12 +4,12 @@ on:
   workflow_call:
     inputs:
       os_version:
-        type: "string"
-        required: true
+        type: string
+        required: false
         default: ubuntu20.04
       cuda_version:
         type: string
-        required: true
+        required: false
         default: "11.6.0"
       target:
         type: string
