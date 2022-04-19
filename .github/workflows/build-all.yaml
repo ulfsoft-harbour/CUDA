@@ -25,20 +25,16 @@ on:
 jobs:
   build-sdk:
     name: Build sdk
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: harbourb/cuda/.github/workflows/build-and-push.yaml@master
-        with:
-          target: sdk
-          os_version: ${{ inputs.os_version }}
-          cuda_version: ${{ inputs.cuda_version }}
+    uses: harbourb/cuda/.github/workflows/build-and-push.yaml@master
+    with:
+      target: sdk
+      os_version: ${{ inputs.os_version }}
+      cuda_version: ${{ inputs.cuda_version }}
 
   build-sdk-vscode:
     name: Build sdk
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: harbourb/cuda/.github/workflows/build-and-push.yaml@master
-        with:
-          target: sdk-vscode
-          os_version: ${{ inputs.os_version }}
-          cuda_version: ${{ inputs.cuda_version }}
+    uses: harbourb/cuda/.github/workflows/build-and-push.yaml@master
+    with:
+      target: sdk-vscode
+      os_version: ${{ inputs.os_version }}
+      cuda_version: ${{ inputs.cuda_version }}
