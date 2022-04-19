@@ -32,7 +32,7 @@ jobs:
       cuda_version: ${{ github.event.inputs.cuda_version }}
 
   build-sdk-vscode:
-    name: Build sdk
+    name: Build sdk-vscode
     uses: harbourb/cuda/.github/workflows/build-and-push.yaml@master
     with:
       target: sdk-vscode
