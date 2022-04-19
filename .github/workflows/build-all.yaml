@@ -1,0 +1,44 @@
+name: Build All
+
+on:
+  workflow_dispatch:
+    inputs:
+      cuda_version:
+        type: string
+        required: false
+        default: "11.6.0"
+        description: "version of CUDA (default = 11.6.0)"
+      os_version:
+        type: "string"
+        required: false
+        default: ubuntu20.04
+        description: "version of base os (default = ubuntu20.04)"
+
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "LICENSE"
+      - "**/README.md"
+      - "docs/*"
+
+jobs:
+  build-sdk:
+    name: Build sdk
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: harbourb/cuda/.github/workflows/build-and-push.yaml@master
+        with:
+          target: sdk
+          os_version: ${{ inputs.os_version }}
+          cuda_version: ${{ inputs.cuda_version }}
+
+  build-sdk-vscode:
+    name: Build sdk
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: harbourb/cuda/.github/workflows/build-and-push.yaml@master
+        with:
+          target: sdk-vscode
+          os_version: ${{ inputs.os_version }}
+          cuda_version: ${{ inputs.cuda_version }}

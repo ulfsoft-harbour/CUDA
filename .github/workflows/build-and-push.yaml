@@ -1,29 +1,29 @@
-name: Build & Publish
+name: Build and push
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       os_version:
+        type: "string"
+        required: true
         default: ubuntu20.04
       cuda_version:
-        default: 11.6.0
-  push:
-    branches:
-      - master
-    paths-ignore:
-      - "LICENSE"
-      - "**/README.md"
-      - "docs/*"
+        type: string
+        required: true
+        default: "11.6.0"
+      target:
+        type: string
+        required: true
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/cuda
 
-  OS_VERSION: ${{ github.event.inputs.os_version }}
-  CUDA_VERSION: ${{ github.event.inputs.cuda_version }}
+  OS_VERSION: ${{ inputs.os_version }}
+  CUDA_VERSION: ${{ inputs.cuda_version }}
 
 jobs:
-  build-sdk:
+  build-and-push:
     runs-on: ubuntu-20.04
     permissions:
       contents: read
@@ -78,27 +78,14 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          file: sdk.Dockerfile
+          file: ${{ inputs.target }}.Dockerfile
           context: .
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/sdk:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/sdk:${{ env.CUDA_VERSION }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/sdk:${{ env.CUDA_VERSION }}-${{ env.RUN_ID }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ inputs.target }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ inputs.target }}:${{ env.CUDA_VERSION }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ inputs.target }}:${{ env.CUDA_VERSION }}-${{ env.RUN_ID }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             OS_VERSION=${{ env.OS_VERSION }}
             CUDA_VERSION=${{ env.CUDA_VERSION }}
-
-      # # Sign the resulting Docker image digest except on PRs.
-      # # This will only write to the public Rekor transparency log when the Docker
-      # # repository is public to avoid leaking data.  If you would like to publish
-      # # transparency data even for private images, pass --force to cosign below.
-      # # https://github.com/sigstore/cosign
-      # - name: Sign the published Docker image
-      #   if: ${{ github.event_name != 'pull_request' }}
-      #   env:
-      #     COSIGN_EXPERIMENTAL: "true"
-      #   # This step uses the identity token to provision an ephemeral certificate
-      #   # against the sigstore community Fulcio instance.
-      #   run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/sdk@${{ steps.build-and-push.outputs.digest }}
