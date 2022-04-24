@@ -1,8 +1,8 @@
-![harbourb/CUDA](docs/images/header.png)
+![ulfsoft-harbour/CUDA](docs/images/header.png)
 
-# harbourb/CUDA
+# ulfsoft-harbour/CUDA
 
 ## Usage
-Take a look at [GitHub Packages](https://github.com/harbourb/CUDA/pkgs/container/cuda%2Fsdk)
+Take a look at [GitHub Packages](https://github.com/ulfsoft-harbour/CUDA/pkgs/container/cuda%2Fsdk)
 
-or use `docker pull ghcr.io/harbourb/cuda/sdk:latest`
+or use `docker pull ghcr.io/ulfsoft-harbour/cuda/sdk:latest`

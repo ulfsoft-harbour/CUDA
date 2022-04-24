@@ -1,5 +1,5 @@
 ARG CUDA_VERSION="11.6.0"
-FROM ghcr.io/harbourb/cuda/sdk:${CUDA_VERSION}
+FROM ghcr.io/ulfsoft-harbour/cuda/sdk:${CUDA_VERSION}
 
 ARG USERNAME=vscode
 ARG USER_UID=1000
